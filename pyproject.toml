@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dwg_analysis"
+version = "0.1.0"
+description = "Columnar analysis tools for Compressed SUSY search in CMS data"
+dependencies = [
+    "awkward",
+    "coffea",
+    "uproot",
+    "numpy",
+    "matplotlib",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

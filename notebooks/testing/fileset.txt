@@ -1,0 +1,15 @@
+fileset = {
+    "JetMET2022C": {
+        "files": {
+            "root://cms-xrd-global.cern.ch//store/data/Run2022C/JetMET/NANOAOD/22Sep2023-v1/2530000/0b6815d2-5fd6-4b55-9374-a32b052c129b.root": "Events",
+            
+        },
+        "metadata": {"is_mc": False, "is_UL": False},
+    },
+    "SMS-TChiWZZToLLmZMin-0p1TuneCP513TeV-madgraphMLM-pythia8RunIISummer20UL18NanoAODv9-106Xupgrade2018realisticv16L1v1-v1NANOAODSIM": {
+        "files": {
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/SMS-TChiWZ_ZToLL_mZMin-0p1_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/2560000/09873976-BDB9-AD4E-8D15-3CB28937D990.root": "Events",
+        },
+        "metadata": {"is_mc": True, "is_UL": True},
+    },
+}

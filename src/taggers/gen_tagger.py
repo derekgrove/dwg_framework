@@ -1,6 +1,6 @@
 import json
 
-from analysis_tools.taggers.gen_filter import *
+from .gen_filter import *
 
 
 def tag_gen(obj, obj_name): 
