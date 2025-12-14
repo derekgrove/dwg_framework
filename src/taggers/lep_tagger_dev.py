@@ -9,7 +9,7 @@ import awkward as ak
 # functions that take the lepton collections, checks if the lepton is baseline, gold, etc., adds a boolean to it if so. Thats it.
 
 
-def tag_qual_no_gen(events):
+def tag_qual(events):
     
     """
     Returns events with new lepton quality fields and combined Leptons collection
@@ -40,6 +40,41 @@ def tag_qual_no_gen(events):
     
     return events
 
+
+def tag_qual_and_gen(events):
+    
+    """
+    Returns events with new lepton quality fields and gen fields and a combined Leptons collection
+    """
+
+    events = tag_gens(events) # Tag the gen-level information, this only works for MC obviously
+    
+    # Tag lepton collections
+    tagged_electrons = tag_ele_quality(events.Electron)
+    tagged_low_pt_electrons = tag_lpte_quality(events.LowPtElectron)
+    tagged_muons = tag_muon_quality(events.Muon)
+    
+    # And now update the events to have the new fields
+    events = ak.with_field(events, tagged_electrons, "Electron")
+    events = ak.with_field(events, tagged_low_pt_electrons, "LowPtElectron")
+    events = ak.with_field(events, tagged_muons, "Muon")
+    
+    # Concatenate into combined Leptons collection
+    leptons = ak.concatenate([
+        tagged_electrons,
+        tagged_low_pt_electrons,
+        tagged_muons
+    ], axis=1)
+    
+    # Add PtEtaPhiMCandidate behavior (for 4-vector operations like .mass and .delta_r)
+    leptons = ak.with_name(leptons, "PtEtaPhiMCandidate")
+    
+    # Add Leptons as a new event field
+    events = ak.with_field(events, leptons, "Leptons")
+    
+    return events
+
+    
 ##################################################
 # global values for convenient "switch flipping" #
 ##################################################
@@ -108,16 +143,22 @@ def tag_ele_quality(ele):  # use on raw Electron collection (Awkward array)
 
     bronze_mask = baseline_mask & ~gold_silver_mask
 
-    #ele['isBaseline'] = baseline_mask # redundant since isGold, isSilver and isBronze sum to isBaseline, useful for debugging though
-    ele['isGold']     = gold_mask
-    ele['isSilver']   = silver_mask
-    ele['isBronze']   = bronze_mask
+    
+    # Add quality masks
+    ele = ak.with_field(ele, gold_mask, 'isGold')
+    ele = ak.with_field(ele, silver_mask, 'isSilver')
+    ele = ak.with_field(ele, bronze_mask, 'isBronze')
 
-    ele["qual_tag"] = -1 # Filling everything with dummy values for now
-    #ele["qual_tag"] = ak.where(ele.isBaseline, 0, ele.qual_tag) # also redundant but useful for debugging by making sure gsb are mutually exlusive (no electrons should be left with "qual_tag == 0"
-    ele["qual_tag"] = ak.where(ele.isBronze, 1, ele.qual_tag) # similar for 1
-    ele["qual_tag"] = ak.where(ele.isSilver, 10, ele.qual_tag) # similar for 1
-    ele["qual_tag"] = ak.where(ele.isGold, 100, ele.qual_tag) # similar for 1
+    # Used to have an 'isBaseline' but its redundant since you can add isGold, isSilver, isBronze to get baseline.
+    # Assuming my categories are correctly mutually exclusive
+    
+    # Create qual_tag int for convenient histogram filling
+    qual_tag = ak.full_like(ele.pt, -1, dtype=int)
+    qual_tag = ak.where(ele.isBronze, 001, qual_tag)
+    qual_tag = ak.where(ele.isSilver, 010, qual_tag)
+    qual_tag = ak.where(ele.isGold, 100, qual_tag)
+    
+    ele = ak.with_field(ele, qual_tag, "qual_tag")
 
     return ele
 
@@ -181,16 +222,16 @@ def tag_lpte_quality(lpte): #use on raw lpte collection
 
     bronze_mask = baseline_mask & ~gold_silver_mask
 
-    #lpte['isBaseline'] = baseline_mask
-    lpte['isGold']     = gold_mask
-    lpte['isSilver']   = silver_mask
-    lpte['isBronze']   = bronze_mask
-
-    lpte["qual_tag"] = -1
-    #lpte["qual_tag"] = ak.where(lpte.isBaseline, 0, lpte.qual_tag) #useful for debugging, see tag_electron_quality 
-    lpte["qual_tag"] = ak.where(lpte.isBronze, 1, lpte.qual_tag)
-    lpte["qual_tag"] = ak.where(lpte.isSilver, 10, lpte.qual_tag)
-    lpte["qual_tag"] = ak.where(lpte.isGold, 100, lpte.qual_tag)
+    lpte = ak.with_field(lpte, gold_mask, 'isGold')
+    lpte = ak.with_field(lpte, silver_mask, 'isSilver')
+    lpte = ak.with_field(lpte, bronze_mask, 'isBronze')
+    
+    qual_tag = ak.full_like(lpte.pt, -1, dtype=int)
+    qual_tag = ak.where(lpte.isBronze, 001, qual_tag)
+    qual_tag = ak.where(lpte.isSilver, 010, qual_tag)
+    qual_tag = ak.where(lpte.isGold, 100, qual_tag)
+    
+    lpte = ak.with_field(lpte, qual_tag, "qual_tag")
 
 
     return lpte
@@ -253,16 +294,16 @@ def tag_muon_quality(muon): #use on raw muon collection
 
     bronze_mask = baseline_mask & ~gold_silver_mask
 
-    #muon['isBaseline'] = baseline_mask
-    muon['isGold']     = gold_mask
-    muon['isSilver']   = silver_mask
-    muon['isBronze']   = bronze_mask
-
-    muon["qual_tag"] = -1
-    #muon["qual_tag"] = ak.where(muon.isBaseline, 0, muon.qual_tag) #useful for debugging, see tag_electron_quality 
-    muon["qual_tag"] = ak.where(muon.isBronze, 1, muon.qual_tag)
-    muon["qual_tag"] = ak.where(muon.isSilver, 10, muon.qual_tag)
-    muon["qual_tag"] = ak.where(muon.isGold, 100, muon.qual_tag)
+    muon = ak.with_field(muon, gold_mask, 'isGold')
+    muon = ak.with_field(muon, silver_mask, 'isSilver')
+    muon = ak.with_field(muon, bronze_mask, 'isBronze')
+    
+    qual_tag = ak.full_like(muon.pt, -1, dtype=int)
+    qual_tag = ak.where(muon.isBronze, 001, qual_tag)
+    qual_tag = ak.where(muon.isSilver, 010, qual_tag)
+    qual_tag = ak.where(muon.isGold, 100, qual_tag)
+    
+    muon = ak.with_field(muon, qual_tag, "qual_tag")
 
     return muon
     

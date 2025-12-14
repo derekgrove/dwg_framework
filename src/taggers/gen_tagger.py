@@ -3,66 +3,62 @@ import json
 from .gen_filter import *
 
 
-def tag_gen(obj, obj_name): 
-
-    """Adds a new field to objs (Electron, LowPtElectron, or Muon collections) named 'gen_tag', can access it like Electron.gen_tag (after you run this function and reassign the electron collection to this one thats returned). 
-
-    The resulting integers correspond like this:
-
-    obj.gen_tag == 0, SIGNAL
-    obj.gen_tag == 1, UNMATCHED TO PV
-    obj.gen_tag == 2, DECAY FROM B OR C
-    obj.gen_tag == 3, DECAY FROM TAU
-    obj.gen_tag == 999, OTHER DECAY (any other genflav than the above)
+def tag_lepton_gen(lepton, gen_mask_func):
     
     """
-
-    if obj_name.lower() in ["ele", "electron"]:
-
-        signal_mask = (
-            (obj.genPartFlav == 1) 
-            & parent_mask(obj)
-            & ele_gen_mask(obj)
-        )
-        
-    elif obj_name.lower() in ["lpte", "lowptelectron"]:
-        
-        signal_mask = (
-            (obj.genPartFlav == 1) 
-            & parent_mask(obj)
-            & lpte_gen_mask(obj)
-        )
-        
-    elif obj_name.lower() in ["mu", "muon"]:
-        
-        signal_mask = (
-            (obj.genPartFlav == 1) 
-            & parent_mask(obj)
-            & muon_gen_mask(obj)
-        )
-        
-    else:
-        sys.exit(f"invalid obj_name: {obj_name}")
-        
-    light_fake_mask = (obj.genPartFlav == 0)
-    heavy_decay_mask = ( (obj.genPartFlav == 4) | (obj.genPartFlav == 5) )
-    tau_decay_mask = (obj.genPartFlav == 15)
+    Generic function to tag leptons with gen-level information
     
-
+    Args:
+        lepton: Electron, LowPtElectron, or Muon collection
+        gen_mask_func: Function that applies lepton-specific gen mask
+    """
     
-    obj["gen_tag"] = -10 # Filling everything with dummy values for now
-    obj["gen_tag"] = ak.where(signal_mask, 10, obj.gen_tag)
-    obj["gen_tag"] = ak.where(light_fake_mask, 11, obj.gen_tag)
-    obj["gen_tag"] = ak.where(heavy_decay_mask, 12, obj.gen_tag)
-    obj["gen_tag"] = ak.where(tau_decay_mask, 13, obj.gen_tag)
-
-#    obj["gen_tag"] = 'other_gen' # Filling everything with dummy values for now
-#    obj["gen_tag"] = ak.where(signal_mask, 'signal', obj.gen_tag)
-#    obj["gen_tag"] = ak.where(light_fake_mask, 'light_fake', obj.gen_tag)
-#    obj["gen_tag"] = ak.where(heavy_decay_mask, 'heavy_decay', obj.gen_tag)
-#    obj["gen_tag"] = ak.where(tau_decay_mask, 'tau_decay', obj.gen_tag)
+    signal_mask = (
+        (lepton.genPartFlav == 1) 
+        & parent_mask(lepton) #Defined for SUSY parents and W/Z bosons
+        & gen_mask_func(lepton)
+    )
     
-    return obj
+    light_fake_mask = (lepton.genPartFlav == 0)
+    heavy_decay_mask = ((lepton.genPartFlav == 4) | (lepton.genPartFlav == 5))
+    tau_decay_mask = (lepton.genPartFlav == 15)
+    
+    
+    gen_tag = ak.full_like(lepton.pt, -1, dtype=int) #initialize new
+    
+    # Now reassign -1 to a different binary int
+    gen_tag = ak.where(tau_decay_mask, 1000, gen_tag)
+    gen_tag = ak.where(heavy_decay_mask, 0100, gen_tag)
+    gen_tag = ak.where(light_fake_mask, 0010, gen_tag)
+    gen_tag = ak.where(signal_mask, 0001, gen_tag)
 
+    # Any lepton that does not satisfy the above will remain -1, can use that to keep track of how many gen particles we don't explore
+    
+    lepton = ak.with_field(lepton, gen_tag, "gen_tag")
+    
+    return lepton
 
-
+def tag_gens(events):
+    
+    """Add gen_tag field to all lepton collections"""
+    
+    events = ak.with_field(
+        events, 
+        tag_lepton_gen(events.Electron, ele_gen_mask), 
+        "Electron"
+    )
+    
+    events = ak.with_field(
+        events, 
+        tag_lepton_gen(events.LowPtElectron, lpte_gen_mask), 
+        "LowPtElectron"
+    )
+    
+    events = ak.with_field(
+        events, 
+        tag_lepton_gen(events.Muon, muon_gen_mask), 
+        "Muon"
+    )
+    
+    return events
+    
