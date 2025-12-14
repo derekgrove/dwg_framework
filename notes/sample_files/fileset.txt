@@ -1,0 +1,25 @@
+fileset = {
+    "JetMET2022C": {
+        "files": {
+            "root://cms-xrd-global.cern.ch//store/data/Run2022C/JetMET/NANOAOD/22Sep2023-v1/2530000/0b6815d2-5fd6-4b55-9374-a32b052c129b.root": "Events",
+            "root://cms-xrd-global.cern.ch//store/data/Run2022C/JetMET/NANOAOD/22Sep2023-v1/2530000/27f35e3e-ceb0-4707-98fd-65e35243d747.root": "Events",
+            "root://cms-xrd-global.cern.ch//store/data/Run2022C/JetMET/NANOAOD/22Sep2023-v1/2530000/e4bb6e09-af8e-4b2a-8f9e-5a3b72de50ab.root": "Events",
+        },
+        "metadata": {"is_mc": False, "is_UL": False},
+    },
+    "SMS-TChiWZZToLLmZMin-0p1TuneCP513TeV-madgraphMLM-pythia8RunIISummer20UL18NanoAODv9-106Xupgrade2018realisticv16L1v1-v1NANOAODSIM": {
+        "files": {
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/SMS-TChiWZ_ZToLL_mZMin-0p1_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/2560000/09873976-BDB9-AD4E-8D15-3CB28937D990.root": "Events",
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/SMS-TChiWZ_ZToLL_mZMin-0p1_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/2560000/0A6B9DF4-B069-C745-B1E0-6F23A274D8B5.root": "Events",
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/SMS-TChiWZ_ZToLL_mZMin-0p1_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/2560000/1718A27A-77B9-E34E-ACDA-5A2224094A2B.root": "Events",
+        },
+        "metadata": {"is_mc": True, "is_UL": True},
+    },
+    "WtoLNu-2JetsTuneCP513p6TeVamcatnloFXFX-pythia8": {
+        "files": {
+            "root://cms-xrd-global.cern.ch//store/mc/Run3Summer23BPixNanoAODv12/WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/NANOAODSIM/130X_mcRun3_2023_realistic_postBPix_v6-v2/2530000/002afc9e-9124-4dde-adf6-0b293d6b0457.root": "Events",
+            "root://cms-xrd-global.cern.ch//store/mc/Run3Summer23BPixNanoAODv12/WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/NANOAODSIM/130X_mcRun3_2023_realistic_postBPix_v6-v2/2530000/03e8a105-7a15-47a1-979d-5d20b0dd5178.root": "Events",
+            "root://cms-xrd-global.cern.ch//store/mc/Run3Summer23BPixNanoAODv12/WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8/NANOAODSIM/130X_mcRun3_2023_realistic_postBPix_v6-v2/2530000/0444b514-84a0-4546-ba46-e2e1c4849632.root": "Events",
+            },
+        "metadata": {"is_mc": True, "is_UL": False},
+}

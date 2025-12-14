@@ -1,0 +1,33 @@
+fileset = {
+    "TChiWZ_2018_300_290": {
+        "files": {
+            "root://cmsxrootd.fnal.gov//store/user/lpcsusylep/NTUPLES_Cascades_v6/Summer20UL18_106X_SMS/SMS-TChiWZ_ZToLL_mZMin-0p1_TuneCP5_13TeV-madgraphMLM-pythia8_Summer20UL18_106X.root": "SMS_300_290",
+        },
+        "metadata": {"is_mc": True, "is_UL": True},
+    },
+    "TChiWZ_2018_300_295": {
+        "files": {
+            "root://cmsxrootd.fnal.gov//store/user/lpcsusylep/NTUPLES_Cascades_v6/Summer20UL18_106X_SMS/SMS-TChiWZ_ZToLL_mZMin-0p1_TuneCP5_13TeV-madgraphMLM-pythia8_Summer20UL18_106X.root": "SMS_300_295",
+        },
+        "metadata": {"is_mc": True, "is_UL": True},
+    },
+    "TChiWZ_2018_300_297": {
+        "files": {
+            "root://cmsxrootd.fnal.gov//store/user/lpcsusylep/NTUPLES_Cascades_v6/Summer20UL18_106X_SMS/SMS-TChiWZ_ZToLL_mZMin-0p1_TuneCP5_13TeV-madgraphMLM-pythia8_Summer20UL18_106X.root": "SMS_300_297",
+        },
+        "metadata": {"is_mc": True, "is_UL": True},
+    },
+    "JetMET0_run3": {
+        "files": {
+            "root://cmsxrootd.fnal.gov//store/user/lpcsusylep/NTUPLES_Cascades_v6/Summer23BPix_130X_Data/JetMET0_Run2023D-22Sep2023_v2-v1_Summer23BPix_130X_Data_Summer23BPix_130X.root": "KUAnalysis",
+        },
+        "metadata": {"is_mc": False, "is_UL": False},
+    },
+    "WtoLNuNtuplev6": {
+        "files": {
+            "root://cmsxrootd.fnal.gov//store/user/lpcsusylep/NTUPLES_Cascades_v6/Summer23BPix_130X/WtoLNu-2Jets_TuneCP5_13p6TeV_amcatnloFXFX-pythia8_Summer23BPix_130X.root": "KUAnalysis",
+        },
+        "metadata": {"is_mc": True, "is_UL": False},
+    },
+    
+}

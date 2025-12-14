@@ -1,0 +1,8 @@
+fileset = {
+"TChiWZ_2018_ntuple": {
+        "files": {
+            "root://cmsxrootd.fnal.gov//store/user/lpcsusylep/NTUPLES_Cascades_v8/Summer20UL18_106X_SMS/SMS-TChiWZ_ZToLL_mZMin-0p1_TuneCP5_13TeV-madgraphMLM-pythia8_Summer20UL18_106X.root": "SMS_300_290",
+        },
+        "metadata": {"is_mc": True, "is_UL": False, "is_ntuple": True},
+    },
+}
