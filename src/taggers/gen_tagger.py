@@ -28,9 +28,9 @@ def tag_lepton_gen(lepton, gen_mask_func):
     
     # Now reassign -1 to a different binary int
     gen_tag = ak.where(tau_decay_mask, 1000, gen_tag)
-    gen_tag = ak.where(heavy_decay_mask, 0100, gen_tag)
-    gen_tag = ak.where(light_fake_mask, 0010, gen_tag)
-    gen_tag = ak.where(signal_mask, 0001, gen_tag)
+    gen_tag = ak.where(heavy_decay_mask, 100, gen_tag)
+    gen_tag = ak.where(light_fake_mask, 10, gen_tag)
+    gen_tag = ak.where(signal_mask, 1, gen_tag)
 
     # Any lepton that does not satisfy the above will remain -1, can use that to keep track of how many gen particles we don't explore
     

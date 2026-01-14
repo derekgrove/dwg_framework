@@ -23,9 +23,9 @@ def tag_qual(obj, ID):
     
     if ID_lower in ['ele', 'electron']:
         obj = tag_ele_quality(obj)
-    elif ID_lower in ['lpte', 'lowptelectron']: 
+    elif ID_lower in ['lpte', 'lowptelectron']:
         obj = tag_lpte_quality(obj)
-    elif ID_lower in ['mu', 'muon']: 
+    elif ID_lower in ['mu', 'muon']:
         obj = tag_muon_quality(obj)
 
     return obj

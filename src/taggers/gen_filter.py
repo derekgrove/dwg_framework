@@ -62,6 +62,8 @@ def parent_mask(obj):
 
 ###########################################################################
 # Gen kinematic masks here
+# These are so we do not get punished if the gen particle has shit kinematics
+# It may later get reconstructed with better kinematics, however, the gen is shit
 
 
 def ele_gen_mask(ele_obj):

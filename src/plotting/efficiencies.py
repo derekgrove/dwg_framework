@@ -14,9 +14,9 @@ def init_plt():
     import matplotlib.pyplot as plt
     import matplotlib.colors as colors
     import mplhep
-    mplhep.style.use(mplhep.style.CMS)
-    plt.figure()
-    mplhep.style.use(mplhep.style.CMS)
+    mplhep.style.use(mplhep.style.CMS)  #This was needed for debug in past, may be fixed by now, idk
+    plt.figure()                        #This was needed for debug in past, may be fixed by now, idk
+    mplhep.style.use(mplhep.style.CMS)  #This was needed for debug in past, may be fixed by now, idk
 
 
 def calc_eff_err_old(hist_1, hist_2): #hist_2 is the denominator of the efficiency

@@ -9,15 +9,15 @@ import awkward as ak
 # functions that take the lepton collections, checks if the lepton is baseline, gold, etc., adds a boolean to it if so. Thats it.
 
 
-def tag_qual(events):
+def tag_qual(events, is_UL):
     
     """
     Returns events with new lepton quality fields and combined Leptons collection
     """
     
     # Tag lepton collections
-    tagged_electrons = tag_ele_quality(events.Electron)
-    tagged_low_pt_electrons = tag_lpte_quality(events.LowPtElectron)
+    tagged_electrons = tag_ele_quality(events.Electron, is_UL)
+    tagged_low_pt_electrons = tag_lpte_quality(events.LowPtElectron, is_UL)
     tagged_muons = tag_muon_quality(events.Muon)
     
     # And now update the events to have the new fields
@@ -31,17 +31,24 @@ def tag_qual(events):
         tagged_low_pt_electrons,
         tagged_muons
     ], axis=1)
+
+    combined_electrons = ak.concatenate([
+        tagged_electrons[tagged_electrons.pt >= 7],
+        tagged_low_pt_electrons[tagged_low_pt_electrons.pt < 7]
+    ], axis=1)
     
     # Add PtEtaPhiMCandidate behavior (for 4-vector operations like .mass and .delta_r)
     leptons = ak.with_name(leptons, "PtEtaPhiMCandidate")
+    combined_electrons = ak.with_name(combined_electrons, "PtEtaPhiMCandidate")
     
     # Add Leptons as a new event field
     events = ak.with_field(events, leptons, "Leptons")
+    events = ak.with_field(events, combined_electrons, "combined_Electron")
     
     return events
 
 
-def tag_qual_and_gen(events):
+def tag_qual_and_gen(events, is_UL):
     
     """
     Returns events with new lepton quality fields and gen fields and a combined Leptons collection
@@ -50,8 +57,8 @@ def tag_qual_and_gen(events):
     events = tag_gens(events) # Tag the gen-level information, this only works for MC obviously
     
     # Tag lepton collections
-    tagged_electrons = tag_ele_quality(events.Electron)
-    tagged_low_pt_electrons = tag_lpte_quality(events.LowPtElectron)
+    tagged_electrons = tag_ele_quality(events.Electron, is_UL)
+    tagged_low_pt_electrons = tag_lpte_quality(events.LowPtElectron, is_UL)
     tagged_muons = tag_muon_quality(events.Muon)
     
     # And now update the events to have the new fields
@@ -65,12 +72,19 @@ def tag_qual_and_gen(events):
         tagged_low_pt_electrons,
         tagged_muons
     ], axis=1)
+
+    combined_electrons = ak.concatenate([
+        tagged_electrons[tagged_electrons.pt >= 7],
+        tagged_low_pt_electrons[tagged_low_pt_electrons.pt < 7]
+    ], axis=1)
     
     # Add PtEtaPhiMCandidate behavior (for 4-vector operations like .mass and .delta_r)
     leptons = ak.with_name(leptons, "PtEtaPhiMCandidate")
+    combined_electrons = ak.with_name(combined_electrons, "PtEtaPhiMCandidate")
     
     # Add Leptons as a new event field
     events = ak.with_field(events, leptons, "Leptons")
+    events = ak.with_field(events, combined_electrons, "combined_Electron")
     
     return events
 
@@ -84,7 +98,7 @@ global_sip3d = 3
 ##################################################
 ##################################################
 
-def tag_ele_quality(ele):  # use on raw Electron collection (Awkward array)
+def tag_ele_quality(ele, is_UL=False):  # use on raw Electron collection (Awkward array)
     
     """
     Add 'isGold', 'isSilver', 'isBronze' boolean field to events.Electron based on cuts.
@@ -121,11 +135,18 @@ def tag_ele_quality(ele):  # use on raw Electron collection (Awkward array)
         & (miniIsoPt <= 4)
         & tight_minus_iso_hoe(ele)
     )
-    
-    high_pt_pass = (
-        (pt >= 20)
-        & ele.mvaIso_WP90
-    )
+
+    if is_UL == False:
+        high_pt_pass = (
+            (pt >= 20)
+            & ele.mvaIso_WP90
+        )
+
+    if is_UL == True:
+        high_pt_pass = (
+            (pt >= 20)
+            & ele.mvaFall17V2Iso_WP90
+        )
 
 
     gold_silver_mask = baseline_mask & (low_pt_pass | high_pt_pass)
@@ -154,8 +175,8 @@ def tag_ele_quality(ele):  # use on raw Electron collection (Awkward array)
     
     # Create qual_tag int for convenient histogram filling
     qual_tag = ak.full_like(ele.pt, -1, dtype=int)
-    qual_tag = ak.where(ele.isBronze, 001, qual_tag)
-    qual_tag = ak.where(ele.isSilver, 010, qual_tag)
+    qual_tag = ak.where(ele.isBronze, 1, qual_tag)
+    qual_tag = ak.where(ele.isSilver, 10, qual_tag)
     qual_tag = ak.where(ele.isGold, 100, qual_tag)
     
     ele = ak.with_field(ele, qual_tag, "qual_tag")
@@ -169,7 +190,7 @@ def tag_ele_quality(ele):  # use on raw Electron collection (Awkward array)
 # LowPtElectrons
 
 
-def tag_lpte_quality(lpte): #use on raw lpte collection
+def tag_lpte_quality(lpte, is_UL=False): #use on raw lpte collection
 
     """
     Add 'isGold', 'isSilver', 'isBronze' boolean field to events.LowPtElectron based on cuts.
@@ -181,13 +202,30 @@ def tag_lpte_quality(lpte): #use on raw lpte collection
     sip3d     = _lpte_sip3d(lpte)
     abs_dxy   = np.abs(lpte.dxy)
     abs_dz    = np.abs(lpte.dz)
-    central_eta_ID = (
-        ((abs_eta >= 0.8) & (abs_eta < 1.442) & (lpte.ID >= 3)) |
-        ((abs_eta < 0.8) & (lpte.ID >= 2.3))
-    )
-
     pt        = lpte.pt
     miniIsoPt = lpte.miniPFRelIso_all * pt
+
+    if is_UL == False:
+        central_eta_ID = (
+            ((abs_eta >= 0.8) & (abs_eta < 1.442) & (lpte.ID >= 3)) |
+            ((abs_eta < 0.8) & (lpte.ID >= 2.3))
+        )
+
+        baseline_ID_requirement = 1.5
+
+    if is_UL == True:
+        central_eta_ID = (
+        ((pt < 4) &
+        (((abs_eta >= 0.8) & (abs_eta < 1.442) & (lpte.ID >= 3)) |
+        ((abs_eta < 0.8) & (lpte.ID >= 2.6)))) |
+        ((pt >= 4) &
+        (((abs_eta >= 0.8) & (abs_eta < 1.442) & (lpte.ID >= 3.2)) |
+        ((abs_eta < 0.8) & (lpte.ID >= 2.8))))
+        )
+
+        baseline_ID_requirement = 2
+
+    
 
     # --- Baseline selection ---
     baseline_mask = (
@@ -199,7 +237,7 @@ def tag_lpte_quality(lpte): #use on raw lpte collection
         & (miniIsoPt < (20 + 300/pt))
         & (lpte.convVeto == 1)
         & (lpte.lostHits == 0)
-        & (lpte.ID >= 1.5)
+        & (lpte.ID >= baseline_ID_requirement)
     )
 
     # --- Quality tags ---
@@ -227,8 +265,8 @@ def tag_lpte_quality(lpte): #use on raw lpte collection
     lpte = ak.with_field(lpte, bronze_mask, 'isBronze')
     
     qual_tag = ak.full_like(lpte.pt, -1, dtype=int)
-    qual_tag = ak.where(lpte.isBronze, 001, qual_tag)
-    qual_tag = ak.where(lpte.isSilver, 010, qual_tag)
+    qual_tag = ak.where(lpte.isBronze, 1, qual_tag)
+    qual_tag = ak.where(lpte.isSilver, 10, qual_tag)
     qual_tag = ak.where(lpte.isGold, 100, qual_tag)
     
     lpte = ak.with_field(lpte, qual_tag, "qual_tag")
@@ -299,8 +337,8 @@ def tag_muon_quality(muon): #use on raw muon collection
     muon = ak.with_field(muon, bronze_mask, 'isBronze')
     
     qual_tag = ak.full_like(muon.pt, -1, dtype=int)
-    qual_tag = ak.where(muon.isBronze, 001, qual_tag)
-    qual_tag = ak.where(muon.isSilver, 010, qual_tag)
+    qual_tag = ak.where(muon.isBronze, 1, qual_tag)
+    qual_tag = ak.where(muon.isSilver, 10, qual_tag)
     qual_tag = ak.where(muon.isGold, 100, qual_tag)
     
     muon = ak.with_field(muon, qual_tag, "qual_tag")
