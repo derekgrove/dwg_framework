@@ -3,45 +3,46 @@ import mplhep
 import numpy as np
 
 
-def make_AN_1d_pt_eff(signal, fakes, name="default_name", title=None, plot_txt=None, savefig=False):
-
+def make_AN_1d_pt_eff(signal, 
+                      fakes, 
+                      name="default_name", 
+                      title=None, 
+                      plot_txt=None, 
+                      savefig=False,
+                      plot_directory = "plots",
+                      lepton_type="Electron",
+                      com=13.6, 
+                      max_pt=100, 
+                      log_scale=False, 
+                      fake_label="Misidentified"):
+    
     from matplotlib.lines import Line2D
-
-    fig, ax = plt.subplots(figsize=(20, 12))
-
+    fig, ax = plt.subplots(figsize=(25, 12))
     # signal and fakes are 4-axis: [pt, pt_long, eta, qual]
     # Integrate over pt and eta to get [pt_long, qual] for plotting
     
-    # Integrate over pt (axis 0) and eta (axis 2)
-    sig_integrated = signal.integrate("pt").integrate("eta")  # Now [pt_long, qual]
-    fake_integrated = fakes.integrate("pt").integrate("eta")  # Now [pt_long, qual]
+    sig_integrated = signal.integrate("pt").integrate("eta")
+    fake_integrated = fakes.integrate("pt").integrate("eta")
     
-    # Select quality levels
-    sig_gold = sig_integrated[:, 100j]     # [pt_long]
-    sig_silver = sig_integrated[:, 10j]    # [pt_long]
-    sig_bronze = sig_integrated[:, 1j]     # [pt_long]
+    sig_gold = sig_integrated[:, 100j]
+    sig_silver = sig_integrated[:, 10j]
+    sig_bronze = sig_integrated[:, 1j]
     
-    fake_gold = fake_integrated[:, 100j]   # [pt_long]
-    fake_silver = fake_integrated[:, 10j]  # [pt_long]
-    fake_bronze = fake_integrated[:, 1j]   # [pt_long]
+    fake_gold = fake_integrated[:, 100j]
+    fake_silver = fake_integrated[:, 10j]
+    fake_bronze = fake_integrated[:, 1j]
     
-    # Baseline = sum of bronze, silver, gold
     sig_baseline = (sig_bronze + sig_silver + sig_gold)
     fake_baseline = (fake_bronze + fake_silver + fake_gold)
     
     sig_gold_eff_err = calc_eff_err(sig_gold, sig_baseline) 
     sig_silver_eff_err = calc_eff_err(sig_silver, sig_baseline)
     sig_bronze_eff_err = calc_eff_err(sig_bronze, sig_baseline)
-
     fake_gold_eff_err = calc_eff_err(fake_gold, fake_baseline)
     fake_silver_eff_err = calc_eff_err(fake_silver, fake_baseline)
     fake_bronze_eff_err = calc_eff_err(fake_bronze, fake_baseline)
     
-    ax.set_ylim(0, 1)
-
-    # Get edges from pt_long axis (now axis 0 after integration)
     edges = sig_integrated.axes[0].edges
-    
     xes = (edges[:-1] + edges[1:]) * 0.5
     
     my_ms = 14
@@ -55,56 +56,74 @@ def make_AN_1d_pt_eff(signal, fakes, name="default_name", title=None, plot_txt=N
     plt.errorbar(xes, y=fake_silver_eff_err[0], yerr=fake_silver_eff_err[1], fmt='s', mfc='none', markersize=my_ms, capsize=my_cs, color='dodgerblue')
     plt.errorbar(xes, y=fake_bronze_eff_err[0], yerr=fake_bronze_eff_err[1], fmt='s', mfc='none', markersize=my_ms, capsize=my_cs, color='firebrick')
     
-    plt.xlim(0, 100)
-    plt.xticks([20, 40, 60, 80], fontsize=40)
-    plt.xlabel("Electron $p_T$ [GeV]", fontsize=40)
-
-    plt.tick_params(axis='y', which='both', right=True, labelright=True, size=20)
+    # X-axis settings (always linear)
+    plt.xlim(0, max_pt)
+    # Adjust xticks based on max_pt
+    if max_pt <= 30:
+        plt.xticks([5, 10, 15, 20, 25, 30], fontsize=40)
+    elif max_pt <= 50:
+        plt.xticks([10, 20, 30, 40, 50], fontsize=40)
+    else:
+        plt.xticks([20, 40, 60, 80, 100], fontsize=40)
     
-    plt.ylim(0, 1.46)
+    plt.xlabel(f"{lepton_type} $p_T$ [GeV]", fontsize=40)
+    
+    # Y-axis settings - handle log scale vs linear scale
+    if log_scale:
+        plt.yscale('log')
+        plt.ylim(0.001, 1.0)  # Log scale needs to avoid 0
+    else:
+        plt.ylim(0, 1.0)
+    
     plt.yticks(fontsize=40)
     plt.ylabel("Efficiency", fontsize=40)
-
-    plt.grid(visible=None, which='major', axis='both', linewidth=2.0)
+    plt.tick_params(axis='both', which='both', right=True, labelright=True, size=20)
+    plt.grid(visible=None, which='major', axis='y', linewidth=2.0)
     
-    mplhep.cms.label(loc=0, fontsize=30, com=13.6)
-
+    if lepton_type.lower() == "electron":
+        plt.axvline(x=7, linestyle='dotted', color='black', linewidth=1.5)
+    
+    #mplhep.cms.label(loc=0, fontsize=30, com=com)
+    mplhep.cms.text("Work in Progress", fontsize=30, loc=0)
+    
     if plot_txt is not None:
-        plt.text(65, 1.2, plot_txt,
+        # Use axes coordinates for positioning
+        plt.text(0.7, 0.95, plot_txt,
                  fontsize=30,
                  color='black',
                  ha='center',
-                 va='bottom',
+                 va='top',
+                 transform=ax.transAxes,
                  rotation=0)
-
+    
     if title is not None:
-        plt.title(title, fontsize=50, pad=40)
-
+        plt.title(title, fontsize=45, pad=40)
+    
     handles = [
         Line2D([0], [0], marker='s', color='brown', label='Bronze', markersize=25, linestyle=''),
         Line2D([0], [0], marker='s', color='dodgerblue', label='Silver', markersize=25, linestyle=''),
         Line2D([0], [0], marker='s', color='darkorange', label='Gold', markersize=25, linestyle=''),
         Line2D([0], [0], marker='o', color='black', label='Prompt', markersize=my_ms, linestyle=''),
-        Line2D([0], [0], marker='s', color='black', label='Misidentified', mfc='none', markersize=my_ms, linestyle='')
+        Line2D([0], [0], marker='s', color='black', label=fake_label, mfc='none', markersize=my_ms, linestyle='')
     ]
     
     fig.legend(
         handles=handles,
-        loc='upper left',
-        bbox_to_anchor=(0.2, 0.85),
+        loc='center left',
+        bbox_to_anchor=(0.93, 0.5),
         fontsize=30,
-        ncol=2,
+        ncol=1,
         frameon=True,
         facecolor='white',
         edgecolor='black',
         framealpha=1
     )
-
-    if savefig:
-        plt.savefig(f"eff_plot_{name}.pdf", bbox_inches='tight')
-    plt.show()
-    return fig, ax
     
+    if savefig:
+        os.makedirs(plot_directory, exist_ok=True)
+        suffix = "_log" if log_scale else ""
+        plt.savefig(f"{plot_directory}/eff_plot_{name}{suffix}.pdf", bbox_inches='tight')
+    return fig, ax
 
 
 

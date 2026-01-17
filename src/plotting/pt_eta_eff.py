@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patheffects as path_effects
 import mplhep
+import os
 
 
 def plot_eta_pt_eff(
@@ -13,6 +14,8 @@ def plot_eta_pt_eff(
     sample_name="test",
     save_name="test",
     color="cividis",
+    save_fig=False,
+    plot_directory = "plots",
     vmin=0, vmax=1,
     event_count=None,
     muon_hist = False,
@@ -43,6 +46,31 @@ def plot_eta_pt_eff(
     IntCategory([-10, 1, 10, 100, 1000], name='gen_tag'),
     IntCategory([-1, 1, 10, 100], name='qual_tag'),
     storage=Double()) # Sum: 430443.0 (480359.0 with flow)
+
+    but then select the ones you want to put into it like:
+    
+
+    numerator = hist[:, :, 1j, 100j]
+    
+    denominator = hist.integrate("qual", [1j, 10j, 100j])[:, :, 1j]
+
+    sample_name = sample_display_names.get(key, key[:20])
+    
+    file_name = sample_file_names.get(key, key[:20])
+
+    
+    plot_eta_pt_eff(
+        numerator, 
+        denominator,
+        "",
+        sample_name=sample_name,
+        save_name=f"{file_name}_signal_ele",
+        color='plasma',
+        vmin=0,
+        vmax=1,
+        event_count=None,
+        com=13 
+    )
     
     """
     
@@ -50,7 +78,9 @@ def plot_eta_pt_eff(
     
     fig, ax = plt.subplots(figsize=(20, 20))
     mplhep.style.use(mplhep.style.CMS)
-    mplhep.cms.label(loc=0, fontsize=35, com=com)
+    #mplhep.cms.label(loc=0, fontsize=35, com=com)
+    #mplhep.cms.label(loc=0, fontsize=35, com=com)
+    mplhep.cms.text("Work in Progress", fontsize=30, loc=0)
     eff = two_d_eff_err(hist_num, hist_denom)
     print(eff)
     pt_edges = hist_num.axes['pt'].edges
@@ -107,9 +137,9 @@ def plot_eta_pt_eff(
             plt.text(j, i, 
                     f"{val:.3f} ± {err:.3f}", 
                     ha='center', va='center', 
-                    color='white', fontsize=32,
+                    color='white', fontsize=38,
                     path_effects=[
-                    path_effects.Stroke(linewidth=2, foreground='black'),
+                    path_effects.Stroke(linewidth=4, foreground='black'),
                     path_effects.Normal()
             ])
     
@@ -124,7 +154,11 @@ def plot_eta_pt_eff(
         plt.text(-1, 2.4, f"num Events: {event_count}", ha='center', rotation=90, va='center', color='black', fontsize=35)
     
     plt.colorbar()
-    plt.savefig(f"plots/{save_name}.pdf", bbox_inches="tight")
+
+    if save_fig:
+        os.makedirs(plot_directory, exist_ok=True)
+        plt.savefig(f"{plot_directory}/{save_name}.pdf", bbox_inches="tight")
+    
     plt.show()
 
     return
