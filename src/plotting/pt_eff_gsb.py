@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import mplhep
 import numpy as np
+import os
 
 
 def make_AN_1d_pt_eff(signal, 
@@ -13,7 +14,9 @@ def make_AN_1d_pt_eff(signal,
                       lepton_type="Electron",
                       com=13.6, 
                       max_pt=100, 
-                      log_scale=False, 
+                      log_scale=False,
+                      marker_size = 14,
+                      cap_size = 11,
                       fake_label="Misidentified"):
     
     from matplotlib.lines import Line2D
@@ -23,6 +26,21 @@ def make_AN_1d_pt_eff(signal,
     
     sig_integrated = signal.integrate("pt").integrate("eta")
     fake_integrated = fakes.integrate("pt").integrate("eta")
+
+    
+    # This block is to remove 0-efficiency points, essentially empty values in the histograms
+    min_pt = 0
+    
+    if lepton_type == "Electron":
+        min_pt = 2 # the binning of my hists conveniently lines up with the pt we are removing
+    if lepton_type == "Muon":
+        min_pt = 3
+
+    sig_integrated  = sig_integrated[min_pt:, :]
+    fake_integrated = fake_integrated[min_pt:, :]
+    
+    #end block of removing 0 eff leptons
+        
     
     sig_gold = sig_integrated[:, 100j]
     sig_silver = sig_integrated[:, 10j]
@@ -45,16 +63,13 @@ def make_AN_1d_pt_eff(signal,
     edges = sig_integrated.axes[0].edges
     xes = (edges[:-1] + edges[1:]) * 0.5
     
-    my_ms = 14
-    my_cs = 11
+    plt.errorbar(xes, y=sig_gold_eff_err[0], yerr=sig_gold_eff_err[1], fmt='o', markersize=marker_size, capsize=cap_size, color='darkorange')
+    plt.errorbar(xes, y=sig_silver_eff_err[0], yerr=sig_silver_eff_err[1], fmt='o', markersize=marker_size, capsize=cap_size, color='dodgerblue')
+    plt.errorbar(xes, y=sig_bronze_eff_err[0], yerr=sig_bronze_eff_err[1], fmt='o', markersize=marker_size, capsize=cap_size, color='firebrick')
     
-    plt.errorbar(xes, y=sig_gold_eff_err[0], yerr=sig_gold_eff_err[1], fmt='o', markersize=my_ms, capsize=my_cs, color='darkorange')
-    plt.errorbar(xes, y=sig_silver_eff_err[0], yerr=sig_silver_eff_err[1], fmt='o', markersize=my_ms, capsize=my_cs, color='dodgerblue')
-    plt.errorbar(xes, y=sig_bronze_eff_err[0], yerr=sig_bronze_eff_err[1], fmt='o', markersize=my_ms, capsize=my_cs, color='firebrick')
-    
-    plt.errorbar(xes, y=fake_gold_eff_err[0], yerr=fake_gold_eff_err[1], fmt='s', mfc='none', markersize=my_ms, capsize=my_cs, color='darkorange')
-    plt.errorbar(xes, y=fake_silver_eff_err[0], yerr=fake_silver_eff_err[1], fmt='s', mfc='none', markersize=my_ms, capsize=my_cs, color='dodgerblue')
-    plt.errorbar(xes, y=fake_bronze_eff_err[0], yerr=fake_bronze_eff_err[1], fmt='s', mfc='none', markersize=my_ms, capsize=my_cs, color='firebrick')
+    plt.errorbar(xes, y=fake_gold_eff_err[0], yerr=fake_gold_eff_err[1], fmt='s', mfc='none', markersize=marker_size, capsize=cap_size, color='darkorange')
+    plt.errorbar(xes, y=fake_silver_eff_err[0], yerr=fake_silver_eff_err[1], fmt='s', mfc='none', markersize=marker_size, capsize=cap_size, color='dodgerblue')
+    plt.errorbar(xes, y=fake_bronze_eff_err[0], yerr=fake_bronze_eff_err[1], fmt='s', mfc='none', markersize=marker_size, capsize=cap_size, color='firebrick')
     
     # X-axis settings (always linear)
     plt.xlim(0, max_pt)
@@ -75,9 +90,10 @@ def make_AN_1d_pt_eff(signal,
     else:
         plt.ylim(0, 1.0)
     
-    plt.yticks(fontsize=40)
-    plt.ylabel("Efficiency", fontsize=40)
+    #plt.yticks(fontsize=40)
+    plt.ylabel(f"Quality Assignment Efficiency", fontsize=40, labelpad = 20)
     plt.tick_params(axis='both', which='both', right=True, labelright=True, size=20)
+    plt.yticks(fontsize=30)
     plt.grid(visible=None, which='major', axis='y', linewidth=2.0)
     
     if lepton_type.lower() == "electron":
@@ -103,14 +119,14 @@ def make_AN_1d_pt_eff(signal,
         Line2D([0], [0], marker='s', color='brown', label='Bronze', markersize=25, linestyle=''),
         Line2D([0], [0], marker='s', color='dodgerblue', label='Silver', markersize=25, linestyle=''),
         Line2D([0], [0], marker='s', color='darkorange', label='Gold', markersize=25, linestyle=''),
-        Line2D([0], [0], marker='o', color='black', label='Prompt', markersize=my_ms, linestyle=''),
-        Line2D([0], [0], marker='s', color='black', label=fake_label, mfc='none', markersize=my_ms, linestyle='')
+        Line2D([0], [0], marker='o', color='black', label='Prompt', markersize=25, linestyle=''),
+        Line2D([0], [0], marker='s', color='black', label=fake_label, mfc='none', markersize=25, linestyle='')
     ]
     
     fig.legend(
         handles=handles,
         loc='center left',
-        bbox_to_anchor=(0.93, 0.5),
+        bbox_to_anchor=(0.95, 0.5),
         fontsize=30,
         ncol=1,
         frameon=True,
@@ -122,6 +138,7 @@ def make_AN_1d_pt_eff(signal,
     if savefig:
         os.makedirs(plot_directory, exist_ok=True)
         suffix = "_log" if log_scale else ""
+        suffix = suffix + "_" + str(max_pt) + "GeV"
         plt.savefig(f"{plot_directory}/eff_plot_{name}{suffix}.pdf", bbox_inches='tight')
     return fig, ax
 
