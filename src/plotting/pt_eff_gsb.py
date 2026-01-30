@@ -92,25 +92,28 @@ def make_AN_1d_pt_eff(signal,
     
     #plt.yticks(fontsize=40)
     plt.ylabel(f"Quality Assignment Efficiency", fontsize=40, labelpad = 20)
-    plt.tick_params(axis='both', which='both', right=True, labelright=True, size=20)
+    plt.tick_params(axis='both', which='both', right=True, labelright=True, size=30)
     plt.yticks(fontsize=30)
     plt.grid(visible=None, which='major', axis='y', linewidth=2.0)
     
     if lepton_type.lower() == "electron":
         plt.axvline(x=7, linestyle='dotted', color='black', linewidth=1.5)
+        plt.axvline(x=20, linestyle='dotted', color='black', linewidth=1.5)
     
     #mplhep.cms.label(loc=0, fontsize=30, com=com)
-    mplhep.cms.text("Work in Progress", fontsize=30, loc=0)
+    mplhep.cms.text("Work in Progress", fontsize=40, loc=0)
     
     if plot_txt is not None:
         # Use axes coordinates for positioning
-        plt.text(0.7, 0.95, plot_txt,
-                 fontsize=30,
+        plt.text(0.7, 1.055, plot_txt,
+                 fontsize=35,
                  color='black',
                  ha='center',
                  va='top',
                  transform=ax.transAxes,
-                 rotation=0)
+                 rotation=0,
+                 weight='bold'
+                )
     
     if title is not None:
         plt.title(title, fontsize=45, pad=40)

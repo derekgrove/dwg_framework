@@ -80,7 +80,7 @@ def plot_eta_pt_eff(
     mplhep.style.use(mplhep.style.CMS)
     #mplhep.cms.label(loc=0, fontsize=35, com=com)
     #mplhep.cms.label(loc=0, fontsize=35, com=com)
-    mplhep.cms.text("Work in Progress", fontsize=30, loc=0)
+    mplhep.cms.text("Work in Progress", fontsize=40, loc=0)
     eff = two_d_eff_err(hist_num, hist_denom)
     print(eff)
     pt_edges = hist_num.axes['pt'].edges
@@ -91,6 +91,9 @@ def plot_eta_pt_eff(
     print(pt_range)
     
     eta_edges = hist_num.axes['eta'].edges
+
+    lep_font_size = 35 #optimized for electron binning, if muon binning below then make smaller
+    lep_x_label_size = 37
     
     if muon_hist:
         # Don't skip any bins for muon histograms
@@ -99,6 +102,9 @@ def plot_eta_pt_eff(
         eta_indices = list(range(len(eta_edges) - 1))
         eff_filtered = eff[0]
         errors_filtered = eff[1]
+        lep_font_size = 25
+        
+        lep_x_label_size = 30
     else:
         # Filter out the 1.4442-1.556 bin (index 2)
         skip_bin = 2
@@ -123,37 +129,75 @@ def plot_eta_pt_eff(
         vmax=vmax
     )
     
-    plt.xticks(ticks=range(len(eta_labels)), labels=eta_labels, fontsize=30)
-    plt.yticks(ticks=range(len(pt_labels)), labels=pt_labels, fontsize=30)
+    plt.xticks(ticks=range(len(eta_labels)), labels=eta_labels)
+    plt.yticks(ticks=range(len(pt_labels)), labels=pt_labels)
     
     # Get the efficiency values and errors (filtered)
-    values = np.nan_to_num(eff_filtered, nan=0.0)
-    errors_filtered = np.nan_to_num(errors_filtered, nan=0.0)
+    values = np.nan_to_num(eff_filtered, nan=-111)
+    errors_filtered = np.nan_to_num(errors_filtered, nan=-111)
+
+    #There is a remaining bug where values that are 0.00 are getting treated as NaN or something
+    #they are not being plotted, boxes are being left empty. 
+
+    #Also, another bug I'm aware of, values that are not written at this step (literally text on the plot) are still
+    #plotted, i.e. their color is still filled in for that bin, and thats because we plot the colors are at earlier step.
+
+    #To remove that bug, must actually go check the bins and do something, idk exactly.
     
     for i in range(len(pt_labels)):
         for j in range(len(eta_labels)):
             val = values[i, j]
             err = errors_filtered[i, j]
+            
+            if val == -111 and err == -111: # Skip empty bins that are NaN, correspond to empty bins in hist
+                continue
+                
             plt.text(j, i, 
-                    f"{val:.3f} ± {err:.3f}", 
+                    f"{val:.3f} ± {err:.2e}", 
                     ha='center', va='center', 
-                    color='white', fontsize=38,
+                    color='white', fontsize=lep_font_size,
                     path_effects=[
                     path_effects.Stroke(linewidth=4, foreground='black'),
                     path_effects.Normal()
             ])
     
     ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
-    plt.tick_params(axis='x', pad=15)
-    plt.tick_params(axis='y', pad=15)
+    plt.tick_params(axis='x', pad=15, labelsize=lep_x_label_size)
+    plt.tick_params(axis='y', pad=15, labelsize = 37)
     plt.ylabel("$p_T$ (GeV)", fontsize=50)
+    
     if event_count is None:
-        plt.text(-1, 2.4, f"Sample: {sample_name} {source}", ha='center', rotation=90, va='center', color='black', fontsize=35)
+        ax.text(
+            -0.23, 0.3,  # x a bit left of the axes, y centered
+            f"Sample: {sample_name}",
+            transform=ax.transAxes,
+            ha="center", va="center",
+            rotation=90,
+            color="black",
+            fontsize=35,
+            clip_on=False,   # allow text outside axes
+        )
+        ax.text(
+            -0.17, 0.3,  # x a bit left of the axes, y centered
+            f"Source: {source}",
+            transform=ax.transAxes,
+            ha="center", va="center",
+            rotation=90,
+            color="black",
+            fontsize=35,
+            clip_on=False,   # allow text outside axes
+        )
+
+        for x in np.arange(-0.5, len(eta_labels), 1): # put faint black line to seperate eta bins
+            ax.axvline(x, color='black', lw=1, alpha=0.3)
+
+
     if event_count is not None:
         plt.text(-1.3, 2.4, f"Sample: {sample_name} {source}", ha='center', rotation=90, va='center', color='black', fontsize=35)
         plt.text(-1, 2.4, f"num Events: {event_count}", ha='center', rotation=90, va='center', color='black', fontsize=35)
     
-    plt.colorbar()
+    cbar = plt.colorbar()
+    cbar.ax.tick_params(labelsize=35)
 
     if save_fig:
         os.makedirs(plot_directory, exist_ok=True)
