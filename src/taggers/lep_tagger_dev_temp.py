@@ -88,15 +88,15 @@ def tag_qual_and_gen(events, is_UL):
     
     return events
 
-    
+
 ##################################################
 # global values for convenient "switch flipping" #
-##################################################
+# #################################################
 
 global_tight_sip3d = 3
 
 ##################################################
-##################################################
+# #################################################
 
 def tag_ele_quality(ele, is_UL=False):  # use on raw Electron collection (Awkward array)
     
@@ -269,8 +269,39 @@ def tag_lpte_quality(lpte, is_UL=False): #use on raw lpte collection
     qual_tag = ak.where(lpte.isSilver, 10, qual_tag)
     qual_tag = ak.where(lpte.isGold, 100, qual_tag)
     
-    lpte = ak.with_field(lpte, qual_tag, "qual_tag")
+    #lpte = ak.with_field(lpte, qual_tag, "qual_tag")
 
+
+
+    ### New masks here!!
+
+    baseline_plus_ID = (
+        baseline_mask
+        & central_eta_ID
+    )
+
+    baseline_plus_ID_SIP3D = (
+        baseline_mask
+        & central_eta_ID
+        & (sip3d < global_tight_sip3d)
+    )
+
+    baseline_plus_ID_SIP3D_ISO = (
+        baseline_mask
+        & central_eta_ID
+        & (sip3d < global_tight_sip3d)
+        & (miniIsoPt <= 4)
+    )
+
+    lpte = ak.with_field(lpte, baseline_plus_ID, 'baseline_plus_ID')
+    lpte = ak.with_field(lpte, baseline_plus_ID_SIP3D, 'baseline_plus_ID_SIP3D')
+    lpte = ak.with_field(lpte, baseline_plus_ID_SIP3D_ISO, 'baseline_plus_ID_SIP3D_ISO')
+
+    qual_tag = ak.where(lpte.baseline_plus_ID, 20, qual_tag)
+    qual_tag = ak.where(lpte.baseline_plus_ID_SIP3D, 200, qual_tag)
+    qual_tag = ak.where(lpte.baseline_plus_ID_SIP3D_ISO, 2000, qual_tag)
+    
+    lpte = ak.with_field(lpte, qual_tag, "qual_tag")
 
     return lpte
 

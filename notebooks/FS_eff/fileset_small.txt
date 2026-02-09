@@ -1,0 +1,33 @@
+fileset = {
+    "TTJetsDiLept2018UL": {
+        "files": {
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/2550000/AC422413-0585-F242-A668-765246C10C8B.root": "Events",
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/2820000/08C60332-7005-4841-927F-31D001B617F0.root": "Events",
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/2820000/0BC549F7-0B1E-8C40-A627-2B001158FB0D.root": "Events",
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/2820000/16CCFE85-74CA-DC44-9ADC-7EA801CB7AFB.root": "Events",
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/2820000/1735B7AA-DE40-E949-9CA2-A1B0D98173B9.root": "Events",  
+        },
+        "metadata": {"is_mc": True, "is_UL": True},
+    },
+    "TTJetsDiLept2018ULFS": {
+        "files": {
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/FSUL18_FSUL18_106X_upgrade2018_realistic_v16_L1v1-v1/2550000/13E40937-B0A7-F047-8D1D-12D983E37458.root": "Events",
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/FSUL18_FSUL18_106X_upgrade2018_realistic_v16_L1v1-v1/2550000/3CB7AA5D-1770-5442-9889-8D6D48949851.root": "Events",
+        },
+        "metadata": {"is_mc": True, "is_UL": True},
+    },
+    "TTto2L2Nu2018UL": {
+        "files": {
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/130000/0804DEBA-97D5-BE46-BB9D-B1125570966E.root": "Events",
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/130000/10671CD1-1127-0842-AE7F-AF20DA985C45.root": "Events",
+        },
+        "metadata": {"is_mc": True, "is_UL": True},
+    },
+    "TTto2L2Nu2018ULFS": {
+        "files": {
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/FSUL18_FSUL18_106X_upgrade2018_realistic_v16_L1v1_ext1-v3/80000/00198B2B-084B-9543-90DA-C5910A401B5E.root": "Events",
+            "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/FSUL18_FSUL18_106X_upgrade2018_realistic_v16_L1v1_ext1-v3/80000/0029765A-94B1-8644-B985-0D8EF8BA5D5E.root": "Events",
+        },
+        "metadata": {"is_mc": True, "is_UL": True},
+    },
+}

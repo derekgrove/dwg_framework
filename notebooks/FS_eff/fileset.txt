@@ -50,7 +50,7 @@ fileset = {
             "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/70000/6C7016A6-4542-9E40-931D-CBEF1F136B3F.root": "Events",
             "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/80000/95D42287-5FCD-D849-8864-1E30F092C85F.root": "Events",
         },
-        "metadata": {"is_mc": True, "is_UL": False},
+        "metadata": {"is_mc": True, "is_UL": True},
     },
     "TTJetsDiLept2018ULFS": {
         "files": {
@@ -60,7 +60,7 @@ fileset = {
             "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/FSUL18_FSUL18_106X_upgrade2018_realistic_v16_L1v1-v1/2550000/A695A907-AD81-B949-9403-69A32F0C1F72.root": "Events",
             "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTJets_DiLept_TuneCP5_13TeV-madgraphMLM-pythia8/NANOAODSIM/FSUL18_FSUL18_106X_upgrade2018_realistic_v16_L1v1-v1/2550000/E018F113-CE0F-0947-8248-5C8314DA8F9B.root": "Events",
         },
-        "metadata": {"is_mc": True, "is_UL": False},
+        "metadata": {"is_mc": True, "is_UL": True},
     },
     "TTto2L2Nu2018UL": {
         "files": {
@@ -220,7 +220,7 @@ fileset = {
             "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/70000/59A037C7-BA84-254D-A164-D1D1319EF22B.root": "Events",
             "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/106X_upgrade2018_realistic_v16_L1v1-v1/70000/FD8CE2C8-4049-E840-9F33-BEDAABC17134.root": "Events",
         },
-        "metadata": {"is_mc": True, "is_UL": False},
+        "metadata": {"is_mc": True, "is_UL": True},
     },
     "TTto2L2Nu2018ULFS": {
         "files": {
@@ -482,6 +482,6 @@ fileset = {
             "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/FSUL18_FSUL18_106X_upgrade2018_realistic_v16_L1v1_ext1-v3/80000/FDD75933-7A5B-0F49-A75C-F883FDA6239F.root": "Events",
             "root://cms-xrd-global.cern.ch//store/mc/RunIISummer20UL18NanoAODv9/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/NANOAODSIM/FSUL18_FSUL18_106X_upgrade2018_realistic_v16_L1v1_ext1-v3/80000/FFADD589-009B-754A-827E-0A8359936A91.root": "Events",
         },
-        "metadata": {"is_mc": True, "is_UL": False},
+        "metadata": {"is_mc": True, "is_UL": True},
     },
 }
