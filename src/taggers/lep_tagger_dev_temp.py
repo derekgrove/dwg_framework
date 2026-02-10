@@ -179,6 +179,31 @@ def tag_ele_quality(ele, is_UL=False):  # use on raw Electron collection (Awkwar
     qual_tag = ak.where(ele.isSilver, 10, qual_tag)
     qual_tag = ak.where(ele.isGold, 100, qual_tag)
     
+    #ele = ak.with_field(ele, qual_tag, "qual_tag")
+
+
+    ### New masks here!!
+
+    
+    if is_UL:
+        ID_mask = ak.where(pt >= 20, ele.mvaFall17V2Iso_WP90, tight_minus_iso_hoe(ele))
+    else:
+        ID_mask = ak.where(pt >= 20, ele.mvaIso_WP90, tight_minus_iso_hoe(ele))
+    
+    baseline_plus_ID = baseline_mask & ID_mask
+    
+    baseline_plus_SIP3D = baseline_mask & (ele.sip3d < global_tight_sip3d)
+    
+    baseline_plus_ISO = baseline_mask & (miniIsoPt <= 4) & (iso03pt <= 4)
+    
+    ele = ak.with_field(ele, baseline_plus_ID, 'baseline_plus_ID')
+    ele = ak.with_field(ele, baseline_plus_SIP3D, 'baseline_plus_SIP3D')
+    ele = ak.with_field(ele, baseline_plus_ISO, 'baseline_plus_ISO')
+
+    qual_tag = ak.where(ele.baseline_plus_ID, 20, qual_tag)
+    qual_tag = ak.where(ele.baseline_plus_SIP3D, 200, qual_tag)
+    qual_tag = ak.where(ele.baseline_plus_ISO, 2000, qual_tag)
+    
     ele = ak.with_field(ele, qual_tag, "qual_tag")
 
     return ele
@@ -280,26 +305,24 @@ def tag_lpte_quality(lpte, is_UL=False): #use on raw lpte collection
         & central_eta_ID
     )
 
-    baseline_plus_ID_SIP3D = (
+    baseline_plus_SIP3D = (
         baseline_mask
-        & central_eta_ID
         & (sip3d < global_tight_sip3d)
     )
 
-    baseline_plus_ID_SIP3D_ISO = (
+    baseline_plus_ISO = (
         baseline_mask
-        & central_eta_ID
-        & (sip3d < global_tight_sip3d)
+        
         & (miniIsoPt <= 4)
     )
 
     lpte = ak.with_field(lpte, baseline_plus_ID, 'baseline_plus_ID')
-    lpte = ak.with_field(lpte, baseline_plus_ID_SIP3D, 'baseline_plus_ID_SIP3D')
-    lpte = ak.with_field(lpte, baseline_plus_ID_SIP3D_ISO, 'baseline_plus_ID_SIP3D_ISO')
+    lpte = ak.with_field(lpte, baseline_plus_ID_SIP3D, 'baseline_plus_SIP3D')
+    lpte = ak.with_field(lpte, baseline_plus_ID_SIP3D_ISO, 'baseline_plus_ISO')
 
     qual_tag = ak.where(lpte.baseline_plus_ID, 20, qual_tag)
-    qual_tag = ak.where(lpte.baseline_plus_ID_SIP3D, 200, qual_tag)
-    qual_tag = ak.where(lpte.baseline_plus_ID_SIP3D_ISO, 2000, qual_tag)
+    qual_tag = ak.where(lpte.baseline_plus_SIP3D, 200, qual_tag)
+    qual_tag = ak.where(lpte.baseline_plus_ISO, 2000, qual_tag)
     
     lpte = ak.with_field(lpte, qual_tag, "qual_tag")
 
@@ -371,6 +394,25 @@ def tag_muon_quality(muon): #use on raw muon collection
     qual_tag = ak.where(muon.isBronze, 1, qual_tag)
     qual_tag = ak.where(muon.isSilver, 10, qual_tag)
     qual_tag = ak.where(muon.isGold, 100, qual_tag)
+    
+    #muon = ak.with_field(muon, qual_tag, "qual_tag")
+
+
+    ### New masks here!!
+    
+    baseline_plus_ID = baseline_mask & tight
+    
+    baseline_plus_SIP3D = baseline_mask & (sip3d < global_tight_sip3d)
+    
+    baseline_plus_ISO = baseline_mask & (miniIsoPt <= 4) & (iso03pt <= 4)
+    
+    muon = ak.with_field(muon, baseline_plus_ID, 'baseline_plus_ID')
+    muon = ak.with_field(muon, baseline_plus_SIP3D, 'baseline_plus_SIP3D')
+    muon = ak.with_field(muon, baseline_plus_ISO, 'baseline_plus_ISO')
+
+    qual_tag = ak.where(muon.baseline_plus_ID, 20, qual_tag)
+    qual_tag = ak.where(muon.baseline_plus_SIP3D, 200, qual_tag)
+    qual_tag = ak.where(muon.baseline_plus_ISO, 2000, qual_tag)
     
     muon = ak.with_field(muon, qual_tag, "qual_tag")
 
